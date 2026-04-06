@@ -53,6 +53,13 @@ export async function GET(request: NextRequest) {
     };
   }
 
+  // Get current active token (not revoked, belongs to this user)
+  const activeToken = await db.query.userTokens.findFirst({
+    columns: { id: true, createdAt: true },
+    where: (t, { and, eq, isNull }) =>
+      and(eq(t.userId, auth.userId), isNull(t.revokedAt)),
+  });
+
   return NextResponse.json({
     user: {
       id: user.id,
@@ -64,5 +71,8 @@ export async function GET(request: NextRequest) {
       createdAt: user.createdAt,
     },
     quota,
+    token: activeToken
+      ? { id: activeToken.id, createdAt: activeToken.createdAt }
+      : null,
   });
 }

@@ -3,9 +3,15 @@ import { db } from "@/lib/db";
 import { skills } from "@/lib/db/schema";
 import { eq, and, isNull } from "drizzle-orm";
 import { getAuthFromCookies } from "@/lib/auth";
+import { getTranslations } from "next-intl/server";
 import { HomeClient } from "./HomeClient";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
+  const t = await getTranslations("home");
+  const tCommon = await getTranslations("common");
+
   // Fetch featured skills (latest 4 approved)
   let featuredSkills: { slug: string; name: string; iconEmoji: string; summary: string }[] = [];
   try {
@@ -42,14 +48,14 @@ export default async function HomePage() {
               href="/skills"
               className="text-sm font-medium text-[#7a6a5a] hover:text-[#a23f00] transition-colors font-body"
             >
-              Explore Skills
+              {tCommon("explore")}
             </Link>
             {auth ? (
               <Link
                 href="/dashboard"
                 className="px-5 py-2.5 bg-gradient-to-r from-[#a23f00] to-[#fa7025] hover:opacity-90 text-white text-sm font-semibold btn-pill shadow-[0_6px_24px_rgba(162,63,0,0.2)] transition-all font-heading"
               >
-                Dashboard
+                {tCommon("dashboard")}
               </Link>
             ) : (
               <>
@@ -57,13 +63,13 @@ export default async function HomePage() {
                   href="/login"
                   className="text-sm font-medium text-[#7a6a5a] hover:text-[#a23f00] transition-colors font-body"
                 >
-                  Sign in
+                  {tCommon("login")}
                 </Link>
                 <Link
                   href="/register"
                   className="px-5 py-2.5 bg-gradient-to-r from-[#a23f00] to-[#fa7025] hover:opacity-90 text-white text-sm font-semibold btn-pill shadow-[0_6px_24px_rgba(162,63,0,0.2)] transition-all font-heading"
                 >
-                  Get started
+                  {tCommon("register")}
                 </Link>
               </>
             )}
@@ -77,32 +83,31 @@ export default async function HomePage() {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 bg-[#fffdf7] border border-[#e8dfc8] rounded-full px-5 py-2 text-sm text-[#7a6a5a] shadow-sm font-body">
             <span>✨</span>
-            <span>Open-source AI Skills Ecosystem</span>
+            <span>{t("hero_badge")}</span>
           </div>
 
           <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold font-heading text-[#564337] leading-[1.05] tracking-tight">
-            Build the future of{" "}
-            <span className="bg-gradient-to-r from-[#a23f00] to-[#fa7025] bg-clip-text text-transparent">AI Social</span> play
+            {t("hero_title")}{" "}
+            <span className="bg-gradient-to-r from-[#a23f00] to-[#fa7025] bg-clip-text text-transparent">{t("hero_title_accent")}</span>{" "}
+            {t("hero_subtitle")}
           </h1>
 
           <p className="text-xl md:text-2xl text-[#7a6a5a] max-w-2xl mx-auto leading-relaxed font-body">
-            ClawPlay is the community hub for X Claw social &amp; entertainment Skills.
-            Share your creativity, discover amazing Skills, and power your X Claw with
-            unified multimodal capabilities.
+            {t("hero_desc")}
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
             <Link
-              href="/register"
+              href={auth ? "/dashboard" : "/register"}
               className="px-8 py-4 bg-gradient-to-r from-[#a23f00] to-[#fa7025] hover:opacity-90 text-white text-base font-semibold btn-pill shadow-[0_6px_24px_rgba(162,63,0,0.2)] transition-all font-heading"
             >
-              Start for free
+              {t("cta_start")}
             </Link>
             <Link
               href="/skills"
               className="px-8 py-4 bg-white hover:bg-[#faf3d0] text-[#a23f00] text-base font-semibold rounded-[40px] border-2 border-[#a23f00] transition-colors font-heading"
             >
-              Browse Skills
+              {t("cta_browse")}
             </Link>
           </div>
         </div>
@@ -115,10 +120,17 @@ export default async function HomePage() {
       <section className="py-16 md:py-20 px-6">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-3xl font-bold font-heading text-[#564337] text-center mb-12">
-            Why ClawPlay?
+            {t("features_title")}
           </h2>
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {FEATURES.map((f) => (
+            {[
+              { icon: "🖼️", title: t("feature_1_title"), desc: t("feature_1_desc") },
+              { icon: "🛡️", title: t("feature_2_title"), desc: t("feature_2_desc") },
+              { icon: "🎁", title: t("feature_3_title"), desc: t("feature_3_desc") },
+              { icon: "🤖", title: t("feature_4_title"), desc: t("feature_4_desc") },
+              { icon: "⚡", title: t("feature_5_title"), desc: t("feature_5_desc") },
+              { icon: "🌍", title: t("feature_6_title"), desc: t("feature_6_desc") },
+            ].map((f) => (
               <div
                 key={f.title}
                 className="bg-[#fffdf7] card-radius p-6 md:p-8 border border-[#e8dfc8] card-shadow space-y-3"
@@ -139,17 +151,17 @@ export default async function HomePage() {
             <div className="flex items-center justify-between mb-8">
               <div>
                 <span className="text-xs font-semibold font-heading text-[#fa7025] uppercase tracking-wider mb-1 block">
-                  Handpicked for you
+                  精选推荐
                 </span>
                 <h2 className="text-2xl md:text-3xl font-bold font-heading text-[#564337]">
-                  Featured Skills
+                  {t("featured_title")}
                 </h2>
               </div>
               <Link
                 href="/skills"
                 className="text-sm font-medium text-[#a23f00] hover:text-[#c45000] transition-colors font-body"
               >
-                View all skills →
+                {t("see_all")}
               </Link>
             </div>
             <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-5">
@@ -162,13 +174,13 @@ export default async function HomePage() {
                   <div className="flex items-start justify-between">
                     <span className="text-3xl">{s.iconEmoji}</span>
                     <span className="inline-block px-2 py-0.5 bg-[#d8e6a6]/60 text-[#586330] text-xs font-semibold rounded-full font-body">
-                      Free
+                      {tCommon("free")}
                     </span>
                   </div>
                   <div>
                     <h3 className="font-semibold font-heading text-[#564337] text-base">{s.name}</h3>
                     <p className="text-xs text-[#7a6a5a] line-clamp-2 mt-1 font-body">
-                      {s.summary || "No description yet."}
+                      {s.summary || tCommon("no_description")}
                     </p>
                   </div>
                 </Link>
@@ -182,17 +194,16 @@ export default async function HomePage() {
       <section className="py-20 md:py-28 px-6">
         <div className="max-w-2xl mx-auto text-center space-y-6">
           <h2 className="text-3xl md:text-4xl font-bold font-heading text-[#564337]">
-            Ready to build something fun?
+            {t("cta_ready")}
           </h2>
           <p className="text-lg text-[#7a6a5a] font-body">
-            Join the community and start creating or using Skills today.
-            Free tier includes 1,000 quota units.
+            {t("cta_desc")}
           </p>
           <Link
             href="/register"
             className="inline-block px-8 py-4 bg-gradient-to-r from-[#a23f00] to-[#fa7025] hover:opacity-90 text-white font-semibold btn-pill shadow-[0_6px_24px_rgba(162,63,0,0.2)] transition-all font-heading"
           >
-            Create your account
+            {t("cta_create")}
           </Link>
         </div>
       </section>
@@ -208,15 +219,20 @@ export default async function HomePage() {
                 <span className="text-base font-bold font-heading text-[#564337]">ClawPlay</span>
               </div>
               <p className="text-sm text-[#7a6a5a] font-body leading-relaxed">
-                The community hub for X Claw social &amp; entertainment Skills. Open source, human-reviewed, privacy-first.
+                {t("footer_brand")}
               </p>
             </div>
 
             {/* About */}
             <div className="space-y-3">
-              <h4 className="text-xs font-semibold font-heading text-[#564337] uppercase tracking-wider">About</h4>
+              <h4 className="text-xs font-semibold font-heading text-[#564337] uppercase tracking-wider">{t("footer_about_title")}</h4>
               <ul className="space-y-2">
-                {FOOTER_ABOUT.map((link) => (
+                {[
+                  { label: t("footer_about"), href: "/about" },
+                  { label: t("footer_docs"), href: "/docs" },
+                  { label: t("footer_blog"), href: "/blog" },
+                  { label: t("footer_careers"), href: "/careers" },
+                ].map((link) => (
                   <li key={link.href}>
                     <Link href={link.href} className="text-sm text-[#7a6a5a] hover:text-[#a23f00] transition-colors font-body">
                       {link.label}
@@ -228,9 +244,14 @@ export default async function HomePage() {
 
             {/* Resources */}
             <div className="space-y-3">
-              <h4 className="text-xs font-semibold font-heading text-[#564337] uppercase tracking-wider">Resources</h4>
+              <h4 className="text-xs font-semibold font-heading text-[#564337] uppercase tracking-wider">{t("footer_resources_title")}</h4>
               <ul className="space-y-2">
-                {FOOTER_RESOURCES.map((link) => (
+                {[
+                  { label: t("footer_skill_guide"), href: "/docs/skill-authoring" },
+                  { label: t("footer_cli_ref"), href: "/docs/cli" },
+                  { label: t("footer_api"), href: "/docs/api" },
+                  { label: t("footer_community"), href: "/community" },
+                ].map((link) => (
                   <li key={link.href}>
                     <Link href={link.href} className="text-sm text-[#7a6a5a] hover:text-[#a23f00] transition-colors font-body">
                       {link.label}
@@ -242,9 +263,13 @@ export default async function HomePage() {
 
             {/* Social */}
             <div className="space-y-3">
-              <h4 className="text-xs font-semibold font-heading text-[#564337] uppercase tracking-wider">Connect</h4>
+              <h4 className="text-xs font-semibold font-heading text-[#564337] uppercase tracking-wider">{t("footer_contact_title")}</h4>
               <div className="flex gap-3">
-                {SOCIAL_LINKS.map((s) => (
+                {[
+                  { label: "GitHub", href: "https://github.com", icon: "⌨️" },
+                  { label: "Twitter", href: "https://twitter.com", icon: "🐦" },
+                  { label: "Discord", href: "https://discord.gg", icon: "💬" },
+                ].map((s) => (
                   <a
                     key={s.label}
                     href={s.href}
@@ -257,20 +282,17 @@ export default async function HomePage() {
                   </a>
                 ))}
               </div>
-              <p className="text-xs text-[#a89888] font-body">
-                Built with intention. © {new Date().getFullYear()} ClawPlay.
-              </p>
             </div>
           </div>
 
           {/* Bottom bar */}
           <div className="border-t border-[#e8dfc8] pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
             <p className="text-xs text-[#a89888] font-body">
-              © {new Date().getFullYear()} ClawPlay. Created with intention.
+              {t("copyright")} {new Date().getFullYear()} ClawPlay。
             </p>
             <div className="flex gap-5">
-              <Link href="/terms" className="text-xs text-[#a89888] hover:text-[#a23f00] transition-colors font-body">Terms</Link>
-              <Link href="/privacy" className="text-xs text-[#a89888] hover:text-[#a23f00] transition-colors font-body">Privacy Policy</Link>
+              <Link href="/terms" className="text-xs text-[#a89888] hover:text-[#a23f00] transition-colors font-body">{t("terms")}</Link>
+              <Link href="/privacy" className="text-xs text-[#a89888] hover:text-[#a23f00] transition-colors font-body">{t("privacy")}</Link>
             </div>
           </div>
         </div>
@@ -278,56 +300,3 @@ export default async function HomePage() {
     </div>
   );
 }
-
-const FEATURES = [
-  {
-    icon: "🖼️",
-    title: "Unified Multimodal CLI",
-    desc: "One command to generate images, synthesize speech, and more. No more managing multiple API keys.",
-  },
-  {
-    icon: "🛡️",
-    title: "API Key Protection",
-    desc: "Your provider API keys stay secure on our server. Skill developers only get encrypted tokens.",
-  },
-  {
-    icon: "🎁",
-    title: "Free Tier Included",
-    desc: "Every account gets 1,000 free quota units. Generous enough to explore, simple enough to start.",
-  },
-  {
-    icon: "🤖",
-    title: "Human Review",
-    desc: "All Skills are reviewed before publication. Quality and safety guaranteed for X Claw users.",
-  },
-  {
-    icon: "⚡",
-    title: "One-click Setup",
-    desc: "Copy one command to your X Claw environment. No configuration needed.",
-  },
-  {
-    icon: "🌍",
-    title: "Open Source",
-    desc: "Built in the open, for the community. Fork, contribute, and shape the future of AI Skills.",
-  },
-];
-
-const FOOTER_ABOUT = [
-  { label: "About", href: "/about" },
-  { label: "Documentation", href: "/docs" },
-  { label: "Blog", href: "/blog" },
-  { label: "Careers", href: "/careers" },
-];
-
-const FOOTER_RESOURCES = [
-  { label: "Skill Authoring Guide", href: "/docs/skill-authoring" },
-  { label: "CLI Reference", href: "/docs/cli" },
-  { label: "API Docs", href: "/docs/api" },
-  { label: "Community", href: "/community" },
-];
-
-const SOCIAL_LINKS = [
-  { label: "GitHub", href: "https://github.com", icon: "⌨️" },
-  { label: "Twitter", href: "https://twitter.com", icon: "🐦" },
-  { label: "Discord", href: "https://discord.gg", icon: "💬" },
-];

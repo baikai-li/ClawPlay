@@ -2,6 +2,8 @@
 
 # ClawPlay
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+
 **X Claw 社交娱乐 Skill 的开源社区枢纽。**
 
 ClawPlay 让 AI Agent（通过 X Claw）无需管理 API 密钥即可生成图像、视觉分析、语音合成。开发者将 Skill 提交到经过人工审核的社区注册表；用户获得统一 CLI 和免费配额。
@@ -220,11 +222,10 @@ pnpm test:all
 | 阶段 | 目标 | 状态 |
 |------|------|------|
 | Phase 1 | 核心基础设施（CLI、Web、Relay、Token 系统） | ✅ 已完成 |
-| Phase 2 | 社区与生态（ClawHub 整合、安全扫描、install.sh） | 🔲 计划中 |
-| Phase 3 | 商业化与规模化（Token Plan、多 Provider 故障转移） | 🔲 计划中 |
-| Phase 4 | 社交与用户体验（分享、评分、通知中心） | 🔲 计划中 |
-| Phase 5 | 高级 AI 能力（Skill 中断恢复、IP 记忆注入） | 🔲 计划中 |
-| Phase 6 | 国际化版本（GitHub OAuth、Stripe、多区域部署） | 🔲 计划中 |
+| Phase 2 | Web 正式上线 + Skill 生态（M0：正式部署 → M6：出海准备） | 🔲 进行中 |
+| Phase 3 | 社交与用户体验（分享、评分、Featured 轮播、通知中心） | 🔲 计划中 |
+| Phase 4 | 商业化与规模化（Token Plan、多 Provider 故障转移） | 🔲 计划中 |
+| Phase 5 | 高级 AI 能力 — 双线深化：Skill 中断恢复 + IP 记忆知识库 | 🔲 计划中 |
 
 完整路线图见 [ROADMAP.md](./ROADMAP.md)。
 
@@ -246,9 +247,3 @@ pnpm test:all
 4. 或提 Issue / Discussion
 
 所有 Skill 在发布前均经过人工审核，保护 X Claw 用户安全。
-
----
-
-## License
-
-MIT

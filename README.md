@@ -2,6 +2,8 @@
 
 # ClawPlay
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+
 **Open-source community hub for X Claw social & entertainment Skills.**
 
 ClawPlay lets AI Agents (via X Claw) generate images, analyze vision, and synthesize speech — without managing API keys. Developers submit Skills to a human-reviewed registry; users get a unified CLI and free quota.
@@ -219,11 +221,10 @@ pnpm test:all
 | Phase | Goal | Status |
 |-------|------|--------|
 | Phase 1 | Core infrastructure (CLI, Web, Relay, Token system) | ✅ Done |
-| Phase 2 | Community & ecosystem (ClawHub integration, security scanning, install.sh) | 🔲 Planned |
-| Phase 3 | Monetization & scale (Token Plans, multi-provider failover) | 🔲 Planned |
-| Phase 4 | Social & UX (sharing, reviews, notification center) | 🔲 Planned |
-| Phase 5 | Advanced AI (Skill recovery, IP memory injection) | 🔲 Planned |
-| Phase 6 | International edition (GitHub OAuth, Stripe, multi-region deploy) | 🔲 Planned |
+| Phase 2 | Web launch + Skill ecosystem (M0: production deploy → M6: international expansion) | 🔲 In Progress |
+| Phase 3 | Social & UX (sharing, reviews, Featured carousel, notification center) | 🔲 Planned |
+| Phase 4 | Monetization & scale (Token Plans, multi-provider failover) | 🔲 Planned |
+| Phase 5 | Advanced AI — dual-track: Skill recovery + IP memory knowledge base | 🔲 Planned |
 
 See [ROADMAP.md](./ROADMAP.md) for full details.
 
@@ -245,9 +246,3 @@ See [ROADMAP.md](./ROADMAP.md) for full details.
 4. Or open an issue / discussion
 
 All Skills are human-reviewed before publication to protect X Claw users.
-
----
-
-## License
-
-MIT

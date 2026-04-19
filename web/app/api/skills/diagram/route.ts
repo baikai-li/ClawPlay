@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAuthFromCookies } from "@/lib/auth";
 import { getT } from "@/lib/i18n";
 import { extractPhaseDescriptions } from "@cli/skill/diagram.mjs";
+import { getLLMProvider } from "@/lib/providers/llm";
 
 // ---------------------------------------------------------------------------
 // Inline helpers from diagram.mjs (not exported)
@@ -129,7 +130,12 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const t = await getT("submit");
+  const tSubmit = await getT("submit");
+  const tErrors = await getT("errors");
+  const t = (key: string) => {
+    const r = tSubmit(key);
+    return r !== key ? r : tErrors(r);
+  };
 
   try {
     const sections = extractPhaseSections(skillMdContent);
@@ -176,36 +182,20 @@ export async function POST(request: NextRequest) {
       "只输出 ```mermaid 代码块，不要输出任何解释文字。",
     ].join("\n");
 
-    // Call relay via fetch (no exec)
-    const apiUrl =
-      process.env.CLAWPLAY_API_URL ||
-      (request.nextUrl.protocol === "https:"
-        ? "https://" + request.headers.get("host")
-        : "http://localhost:3000");
-
-    const res = await fetch(`${apiUrl}/api/ability/llm/generate`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.CLAWPLAY_TOKEN}`,
-      },
-      body: JSON.stringify({ prompt, maxTokens: 800, temperature: 0.3 }),
-    });
-
-    if (!res.ok) {
-      const err = await res.text();
+    // Call LLM provider directly (auth already done via JWT cookie above)
+    let result;
+    try {
+      const provider = getLLMProvider();
+      result = await provider.generate({ prompt, maxTokens: 800, temperature: 0.3 });
+    } catch (err) {
+      console.error("[skills/diagram] LLM provider error:", err);
       return NextResponse.json(
-        { error: `LLM 调用失败: ${err}` },
+        { error: t("text_generation_failed") },
         { status: 502 }
       );
     }
 
-    const data = await res.json();
-    if (data.error) {
-      return NextResponse.json({ error: data.error }, { status: 502 });
-    }
-
-    const raw = data.text?.trim();
+    const raw = result.text?.trim();
     if (!raw) {
       return NextResponse.json(
         { error: t("diagram_llm_empty") },

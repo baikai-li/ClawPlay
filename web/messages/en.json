@@ -694,6 +694,7 @@
     "server_error": "Server error, please try again later.",
     "wechat_not_configured": "WeChat OAuth is not configured.",
     "name_required": "name and skillMdContent are required.",
+    "workflow_required": "workflow diagram is required. Please generate it before submitting.",
     "security_scan_failed": "Security scan failed.",
     "safety_review_failed": "LLM safety review flagged this content.",
     "skill_submitted": "Skill submitted. Pending review.",

@@ -21,7 +21,7 @@ describe("HomeClient", () => {
   it("renders the CLI command code block", () => {
     render(<HomeClient />, { wrapper: TestWrapper });
     expect(
-      screen.getByText("npm install -g clawplay && clawplay setup")
+      screen.getByText("npm install -g clawplay && clawplay setup --agent")
     ).toBeInTheDocument();
   });
 

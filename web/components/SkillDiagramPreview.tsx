@@ -5,6 +5,8 @@ import { useT } from '@/lib/i18n/context';
 
 interface SkillDiagramPreviewProps {
   skillMdContent: string;
+  /** Pre-loaded mermaid diagram (e.g. from a submitted skill). If provided, the generate button is hidden and the diagram renders directly. */
+  initialMermaid?: string;
   /** Called with the raw mermaid text when generation succeeds */
   onGenerated?: (mermaid: string) => void;
   /** Called when loading status changes (loading=true → start, idle/error/success → done) */
@@ -19,6 +21,7 @@ let mermaidScriptLoaded = false;
 
 export default function SkillDiagramPreview({
   skillMdContent,
+  initialMermaid,
   onGenerated,
   onLoadingChange,
   compact = false,
@@ -34,6 +37,13 @@ export default function SkillDiagramPreview({
 
   // Mark as mounted
   useEffect(() => setMounted(true), []);
+
+  // Initialize from initialMermaid (review page — no generate needed)
+  useEffect(() => {
+    if (!mounted || !initialMermaid) return;
+    setMermaid(initialMermaid);
+    setStatus('success');
+  }, [mounted, initialMermaid]);
 
   // Load mermaid.js from CDN once
   useEffect(() => {
@@ -52,9 +62,9 @@ export default function SkillDiagramPreview({
     document.head.appendChild(script);
   }, []);
 
-  // Restore mermaid from localStorage after mount (always)
+  // Restore mermaid from localStorage after mount (skip when initialMermaid is set)
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted || !!initialMermaid) return;
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
@@ -64,7 +74,7 @@ export default function SkillDiagramPreview({
         if (parsed.mermaid) setStatus('success');
       }
     } catch {}
-  }, [mounted]);
+  }, [mounted, initialMermaid]);
 
   const renderSvg = useCallback(async (mermaidCode: string) => {
     const m = (window as Window & { mermaid?: { render(id: string, code: string): Promise<{ svg: string }> } }).mermaid;
@@ -162,8 +172,8 @@ export default function SkillDiagramPreview({
 
   return (
     <div className="space-y-3">
-      {/* Generate button — hidden in compact mode (button lives in label row) */}
-      {!compact && (
+      {/* Generate button — hidden when initialMermaid is provided (read-only) or in compact mode */}
+      {!compact && !initialMermaid && (
         <button
           onClick={handleGenerate}
           disabled={status === 'loading'}

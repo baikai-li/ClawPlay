@@ -42,6 +42,12 @@ version: 1.0.0
 A test skill for integration tests.
 `;
 
+const SAMPLE_WORKFLOW_MD = `\`\`\`mermaid
+stateDiagram-v2
+  [*] --> init
+  init --> [*]
+\`\`\``;
+
 let dbPath: string;
 let db: any;
 let GET_skills: (req: any) => Promise<Response>;
@@ -211,7 +217,7 @@ describe("POST /api/skills/submit", () => {
     cookieStore.token = cookie.replace("clawplay_token=", "");
 
     const req = makeRequest("POST", "/api/skills/submit", {
-      body: { name: "My Integration Skill", skillMdContent: SAMPLE_SKILL_MD },
+      body: { name: "My Integration Skill", skillMdContent: SAMPLE_SKILL_MD, workflowMd: SAMPLE_WORKFLOW_MD },
       cookie,
     });
     const res = await POST_submit(req);
@@ -259,7 +265,7 @@ describe("POST /api/skills/submit", () => {
     const { cookie } = await seedUser(db);
     cookieStore.token = cookie.replace("clawplay_token=", "");
 
-    const body = { name: "Duplicate Skill", skillMdContent: SAMPLE_SKILL_MD };
+    const body = { name: "Duplicate Skill", skillMdContent: SAMPLE_SKILL_MD, workflowMd: SAMPLE_WORKFLOW_MD };
 
     const res1 = await POST_submit(makeRequest("POST", "/api/skills/submit", { body, cookie }));
     const res2 = await POST_submit(makeRequest("POST", "/api/skills/submit", { body, cookie }));
@@ -288,7 +294,7 @@ rm -rf /
 \`\`\`
 `;
     const req = makeRequest("POST", "/api/skills/submit", {
-      body: { name: "Malicious Skill", skillMdContent: maliciousMd },
+      body: { name: "Malicious Skill", skillMdContent: maliciousMd, workflowMd: SAMPLE_WORKFLOW_MD },
       cookie,
     });
     const res = await POST_submit(req);
@@ -329,7 +335,7 @@ sudo apt update
 \`\`\`
 `;
     const req = makeRequest("POST", "/api/skills/submit", {
-      body: { name: "Sudo Skill", skillMdContent: warnMd },
+      body: { name: "Sudo Skill", skillMdContent: warnMd, workflowMd: SAMPLE_WORKFLOW_MD },
       cookie,
     });
     const res = await POST_submit(req);
@@ -354,7 +360,7 @@ echo "Hello world"
 \`\`\`
 `;
     const req = makeRequest("POST", "/api/skills/submit", {
-      body: { name: "Safe Skill", skillMdContent: safeMd },
+      body: { name: "Safe Skill", skillMdContent: safeMd, workflowMd: SAMPLE_WORKFLOW_MD },
       cookie,
     });
     const res = await POST_submit(req);

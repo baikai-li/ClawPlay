@@ -1,6 +1,6 @@
 /**
  * Integration tests for POST /api/skills/diagram.
- * Mocks the LLM relay fetch call and the @cli/skill/diagram.mjs import.
+ * Mocks the LLM provider and the @cli/skill/diagram.mjs import.
  */
 import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
 import { tempDbPath, cleanupDb, seedUser } from "../helpers/db";
@@ -27,6 +27,13 @@ vi.mock("next/headers", () => ({
   })),
 }));
 
+// ── LLM provider mock ────────────────────────────────────────────────────────
+let llmGenerateMock: ReturnType<typeof vi.fn>;
+
+vi.mock("@/lib/providers/llm", () => ({
+  getLLMProvider: vi.fn(() => ({ generate: llmGenerateMock })),
+}));
+
 // ── diagram.mjs mock ─────────────────────────────────────────────────────────
 vi.mock("@cli/skill/diagram.mjs", () => ({
   extractPhaseDescriptions: vi.fn().mockImplementation((content: string) => {
@@ -40,7 +47,7 @@ vi.mock("@cli/skill/diagram.mjs", () => ({
   }),
 }));
 
-// ── Analytics mock ───────────────────────────────────────────────────────────
+// ── Analytics mock ────────────────────────────────────────────────────────────
 vi.mock("@/lib/analytics", () => ({
   analytics: {
     skill: { submit: vi.fn() },
@@ -61,7 +68,6 @@ let dbPath: string;
 let db: any;
 let userCookie: string;
 let POST: (req: any) => Promise<Response>;
-let originalFetch: typeof fetch;
 
 const VALID_SKILL_MD = `---
 name: Test Skill
@@ -91,6 +97,8 @@ stateDiagram-v2
 \`\`\``;
 
 beforeAll(async () => {
+  llmGenerateMock = vi.fn();
+
   dbPath = tempDbPath();
   process.env.DATABASE_URL = dbPath;
   vi.resetModules();
@@ -103,16 +111,12 @@ beforeAll(async () => {
 
   const user = await seedUser(db, { email: "diagram-test@example.com" });
   userCookie = user.cookie;
-
-  // Save original fetch so we can restore it in afterAll
-  originalFetch = global.fetch;
 });
 
 afterAll(() => {
   cleanupDb(dbPath);
   delete process.env.DATABASE_URL;
   cookieStore.token = undefined;
-  global.fetch = originalFetch;
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -147,11 +151,9 @@ describe("POST /api/skills/diagram", () => {
     expect(json.error).toContain("No phase headers detected");
   });
 
-  it("502 when LLM relay returns non-ok", async () => {
+  it("502 when LLM provider throws", async () => {
     cookieStore.token = userCookie.replace("clawplay_token=", "");
-    global.fetch = vi.fn().mockResolvedValue(
-      new Response(null, { status: 500 })
-    );
+    llmGenerateMock.mockRejectedValueOnce(new Error("provider error"));
 
     const req = makeRequest("POST", "/api/skills/diagram", {
       body: { skillMdContent: VALID_SKILL_MD },
@@ -162,12 +164,7 @@ describe("POST /api/skills/diagram", () => {
 
   it("200 and returns mermaid when LLM succeeds", async () => {
     cookieStore.token = userCookie.replace("clawplay_token=", "");
-    global.fetch = vi.fn().mockResolvedValue(
-      new Response(
-        JSON.stringify({ text: MERMAID_RESPONSE }),
-        { status: 200, headers: { "Content-Type": "application/json" } }
-      )
-    );
+    llmGenerateMock.mockResolvedValueOnce({ text: MERMAID_RESPONSE });
 
     const req = makeRequest("POST", "/api/skills/diagram", {
       body: { skillMdContent: VALID_SKILL_MD },
@@ -182,14 +179,9 @@ describe("POST /api/skills/diagram", () => {
 
   it("500 when LLM output lacks code block delimiters", async () => {
     cookieStore.token = userCookie.replace("clawplay_token=", "");
-    global.fetch = vi.fn().mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          text: "stateDiagram-v2\n  [*] --> init\n  init --> [*]",
-        }),
-        { status: 200, headers: { "Content-Type": "application/json" } }
-      )
-    );
+    llmGenerateMock.mockResolvedValueOnce({
+      text: "stateDiagram-v2\n  [*] --> init\n  init --> [*]",
+    });
 
     const req = makeRequest("POST", "/api/skills/diagram", {
       body: { skillMdContent: VALID_SKILL_MD },
@@ -202,14 +194,9 @@ describe("POST /api/skills/diagram", () => {
 
   it("deduplicates stateDiagram-v2 when LLM already includes it", async () => {
     cookieStore.token = userCookie.replace("clawplay_token=", "");
-    global.fetch = vi.fn().mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          text: "```mermaid\nstateDiagram-v2\n  [*] --> init\n  init --> [*]\n```",
-        }),
-        { status: 200, headers: { "Content-Type": "application/json" } }
-      )
-    );
+    llmGenerateMock.mockResolvedValueOnce({
+      text: "```mermaid\nstateDiagram-v2\n  [*] --> init\n  init --> [*]\n```",
+    });
 
     const req = makeRequest("POST", "/api/skills/diagram", {
       body: { skillMdContent: VALID_SKILL_MD },
@@ -226,14 +213,9 @@ describe("POST /api/skills/diagram", () => {
 
   it("500 when LLM output lacks entry node", async () => {
     cookieStore.token = userCookie.replace("clawplay_token=", "");
-    global.fetch = vi.fn().mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          text: "```mermaid\nstateDiagram-v2\n  init --> [*]\n```",
-        }),
-        { status: 200, headers: { "Content-Type": "application/json" } }
-      )
-    );
+    llmGenerateMock.mockResolvedValueOnce({
+      text: "```mermaid\nstateDiagram-v2\n  init --> [*]\n```",
+    });
 
     const req = makeRequest("POST", "/api/skills/diagram", {
       body: { skillMdContent: VALID_SKILL_MD },

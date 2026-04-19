@@ -63,27 +63,15 @@ Claw-Play/ClawPlay     ← 主仓（只有 main）
   └── main
 
 your-fork/ClawPlay    ← 你的 fork
-  ├── main             ← 与 upstream 同步
-  └── dev              ← 开发分支
+  └── main             ← 开发分支，PR 到 upstream main
 ```
 
 ### 开发流程
 
-1. `git checkout dev && git pull` — 开始前同步
+1. `git pull` — 开始前同步
 2. 开发、commit
-3. `git push origin dev` — 推到你的 fork
-4. GitHub 上 PR：`dev` → `upstream main`
-
-### 常用命令
-
-```bash
-# 同步 upstream 到你的 main
-git fetch upstream && git rebase upstream/main
-
-# 同步 upstream 到你的 dev
-git fetch upstream && git rebase upstream/main  # 先同步 main
-git checkout dev && git merge main              # 再合到 dev
-```
+3. `git push origin main` — 推到你的 fork
+4. GitHub 上 PR：`main` → `upstream main`
 
 ### 规范
 

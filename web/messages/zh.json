@@ -694,6 +694,7 @@
     "server_error": "服务器错误，请稍后重试。",
     "wechat_not_configured": "微信 OAuth 未配置。",
     "name_required": "name 和 skillMdContent 为必填项。",
+    "workflow_required": "请先生成流程图后再提交。",
     "security_scan_failed": "安全扫描失败。",
     "safety_review_failed": "LLM 安全审核未通过，内容被标记。",
     "skill_submitted": "Skill 已提交，等待审核。",

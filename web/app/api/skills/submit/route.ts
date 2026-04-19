@@ -53,6 +53,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!workflowMd?.trim()) {
+      return NextResponse.json(
+        { error: t("workflow_required") },
+        { status: 400 }
+      );
+    }
+
     // ── 1. 静态安全扫描 ─────────────────────────────────────────────────────
     const scan = scanSkillContent(skillMdContent);
     if (!scan.safe) {

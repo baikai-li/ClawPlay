@@ -126,7 +126,7 @@ describe("POST /api/skills/submit", () => {
     expect(version.workflowMd).toBe(WORKFLOW_MD);
   });
 
-  it("201 — workflowMd defaults to empty string when not provided", async () => {
+  it("400 — workflowMd is required", async () => {
     cookieStore.token = userCookie.replace("clawplay_token=", "");
 
     const req = makeRequest("POST", "/api/skills/submit", {
@@ -138,12 +138,9 @@ describe("POST /api/skills/submit", () => {
     });
 
     const res = await POST(req);
-    expect(res.status).toBe(201);
-
-    const { skill } = await res.json();
-    const versions = await db.query.skillVersions.findMany();
-    const version = versions.find((v: any) => v.skillId === skill.id);
-    expect(version.workflowMd).toBe("");
+    expect(res.status).toBe(400);
+    const json = await res.json();
+    expect(json.error).toMatch(/workflow|流程图/i);
   });
 
   it("401 when not authenticated", async () => {

@@ -93,6 +93,52 @@ _setup_lang() {
   fi
 }
 
+# ── Configure OpenClaw skills directory ─────────────────────────────────────
+_configure_openclaw_skills() {
+  local oc_config="${HOME}/.openclaw/openclaw.json"
+  local clawplay_skills_dir="${HOME}/.clawplay/skills"
+  local target_dir
+  target_dir=$(eval echo "$clawplay_skills_dir" 2>/dev/null)
+  target_dir="${target_dir/#~/$HOME}"
+
+  if [[ ! -f "$oc_config" ]]; then
+    return 0
+  fi
+
+  local python_code='
+import json, sys, os
+
+config_path = os.path.expanduser("'"$oc_config"'")
+target_dir  = os.path.expanduser("'"$target_dir"'")
+
+with open(config_path) as f:
+    cfg = json.load(f)
+
+extra = (
+    cfg.setdefault("skills", {})
+          .setdefault("load", {})
+          .setdefault("extraDirs", [])
+)
+if target_dir not in extra:
+    extra.append(target_dir)
+
+with open(config_path, "w") as f:
+    json.dump(cfg, f, indent=2, ensure_ascii=False)
+    f.write("\n")
+
+print("ok")
+'
+  local result
+  result=$(python3 -c "$python_code" 2>&1)
+  if [[ "$result" == "ok" ]]; then
+    if [[ "$1" == "zh" ]]; then
+      echo "  ✅ 已将 ${target_dir} 添加到 OpenClaw skills 搜索路径"
+    else
+      echo "  ✅ Added ${target_dir} to OpenClaw skills search path"
+    fi
+  fi
+}
+
 # Interactive setup wizard
 cmd_setup() {
   local lang=$(_setup_lang)
@@ -140,6 +186,11 @@ cmd_setup() {
         ;;
     esac
   done
+
+  # ── Step 0: configure OpenClaw skills directory ────────────────────────────
+  if command -v openclaw >/dev/null 2>&1 || [[ -f "${HOME}/.openclaw/openclaw.json" ]]; then
+    _configure_openclaw_skills "$lang"
+  fi
 
   # i18n: _msg key  →  echo value
   _msg() {
@@ -465,7 +516,6 @@ EOF
     echo " $(_msg manual_hint)"
     echo "  $export_line"
   fi
-
   # Show success + quota
   echo ""
   echo " ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

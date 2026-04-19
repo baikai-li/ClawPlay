@@ -253,7 +253,10 @@ export default function AdminReviewDetailPage() {
                 {t("diagram_preview_label")}
               </p>
               <div className="bg-[#f8f4db] rounded-[22px] md:rounded-[32px] p-4 md:p-6 border border-[rgba(220,193,177,0.3)]">
-                <SkillDiagramPreview skillMdContent={skill.skillMdContent} />
+                <SkillDiagramPreview
+                  skillMdContent={skill.skillMdContent}
+                  initialMermaid={skill.workflowMd ?? undefined}
+                />
               </div>
             </div>
           )}
@@ -285,7 +288,7 @@ export default function AdminReviewDetailPage() {
         </div>
 
         {/* Right sidebar - 4 cols */}
-        <div className="space-y-3.5">
+        <div className="space-y-3.5 lg:col-span-4">
           {/* Moderator Checklist */}
           <div className="bg-[#ede9cf] border border-[rgba(220,193,177,0.3)] rounded-[16px] p-3 md:p-5 space-y-2.5">
             <div className="flex items-center gap-2">

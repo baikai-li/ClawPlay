@@ -68,14 +68,15 @@ your-fork/ClawPlay    ← 你的 fork
 
 ### 开发流程
 
-1. `git pull` — 开始前同步
-2. 开发、commit
-3. `git push origin main` — 推到你的 fork
-4. GitHub 上 PR：`main` → `upstream main`
+1. `git pull origin main` — 开始前同步
+2. 在 main 上开发、commit
+3. `git push origin main`
+4. GitHub 上提 PR → `upstream main`
+5. Review 通过后 merge
 
 ### 规范
 
 - 不要直接 push 到 upstream
 - 不要在 main 上开发
 - 不要选 "Create a merge commit"
-- 不要用 `git reset --hard`、`git push --force`、`git clean -f`
+- 不要用 `git stash`、`git reset --hard`、`git push --force`、`git clean -f`

@@ -9,7 +9,7 @@ export function HomeClient() {
 
   function copySetup() {
     const el = document.createElement("input");
-    el.value = "npm install -g clawplay && clawplay setup";
+    el.value = "npm install -g clawplay && clawplay setup --agent";
     document.body.appendChild(el);
     el.select();
     document.execCommand("copy");
@@ -27,7 +27,7 @@ export function HomeClient() {
         </h2>
         <div className="flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center sm:justify-center">
           <code className="bg-[#fffdf7] border border-[#e8dfc8] rounded-[16px] px-4 py-2 text-sm font-mono-custom text-[#564337]">
-            npm install -g clawplay && clawplay setup
+            npm install -g clawplay && clawplay setup --agent
           </code>
           <button
             onClick={copySetup}

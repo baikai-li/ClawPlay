@@ -1,8 +1,32 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useT } from "@/lib/i18n/context";
-import LineChart from "@/components/charts/LineChart";
 import PieChart from "@/components/charts/PieChart";
+import EventTrendCard from "./EventTrendCard";
+import {
+  ArrowRightIcon,
+  BoltIcon,
+  ChevronDownIcon,
+  DashboardIcon,
+  TargetIcon,
+  UsersIcon,
+} from "@/components/icons";
+
+type Period = "7d" | "30d" | "3m" | "1y";
+
+const PERIOD_OPTIONS: { value: Period; labelKey: string }[] = [
+  { value: "7d", labelKey: "period_7d" },
+  { value: "30d", labelKey: "period_30d" },
+  { value: "3m", labelKey: "period_3m" },
+  { value: "1y", labelKey: "period_1y" },
+];
+
+const filterControlClassName =
+  "rounded-full border border-[#eadfc8] bg-[#fffdf8] px-4 py-2.5 text-sm text-[#5f493a] shadow-[inset_0_1px_0_rgba(255,255,255,0.85),0_8px_20px_rgba(86,67,55,0.05)] transition-colors focus:border-[#d8b07d] focus:outline-none focus:ring-2 focus:ring-[#a23f00]/15";
+const menuClassName =
+  "absolute left-0 top-full z-20 mt-2 min-w-[120px] rounded-[18px] border border-[#eadfc8] bg-[linear-gradient(180deg,#fffdf8_0%,#f7efe1_100%)] p-1 shadow-[0_16px_34px_rgba(86,67,55,0.16)] backdrop-blur-sm";
+const menuItemClassName =
+  "flex min-h-[30px] w-full items-center justify-between rounded-xl px-2.5 py-1 text-left text-xs font-semibold transition-colors";
 
 interface OverviewData {
   period: string;
@@ -39,13 +63,32 @@ const PROVIDER_COLORS: Record<string, string> = {
 
 export default function OverviewClient() {
   const t = useT("admin");
-  const [period, setPeriod] = useState<"7d" | "30d">("7d");
+  const [period, setPeriod] = useState<Period>("7d");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
   const [data, setData] = useState<OverviewData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const currentOption = PERIOD_OPTIONS.find((o) => o.value === period)!;
+
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const handlePointerDown = (e: MouseEvent) => {
+      if (!menuRef.current?.contains(e.target as Node)) setIsMenuOpen(false);
+    };
+    const handleEscape = (e: KeyboardEvent) => { if (e.key === "Escape") setIsMenuOpen(false); };
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [isMenuOpen]);
+
   useEffect(() => {
     setLoading(true);
+    setError(null);
     fetch(`/api/admin/analytics/overview?period=${period}`)
       .then((r) => r.json())
       .then((d) => {
@@ -56,20 +99,20 @@ export default function OverviewClient() {
       .finally(() => setLoading(false));
   }, [period]);
 
-  if (loading) {
+  if (loading && !data) {
     return (
       <div className="space-y-6">
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="bg-white rounded-[32px] p-6 shadow-[0_8px_24px_rgba(86,67,55,0.06)] animate-pulse">
+            <div key={i} className="bg-white rounded-[24px] md:rounded-[32px] p-5 md:p-6 shadow-[0_8px_24px_rgba(86,67,55,0.06)] animate-pulse">
               <div className="h-4 bg-[#e8dfc8] rounded w-1/2 mb-3" />
               <div className="h-8 bg-[#e8dfc8] rounded w-2/3" />
             </div>
           ))}
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-white rounded-[32px] p-6 shadow-[0_8px_24px_rgba(86,67,55,0.06)] h-48 animate-pulse" />
-          <div className="bg-white rounded-[32px] p-6 shadow-[0_8px_24px_rgba(86,67,55,0.06)] h-48 animate-pulse" />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="bg-white rounded-[24px] md:rounded-[32px] p-5 md:p-6 shadow-[0_8px_24px_rgba(86,67,55,0.06)] h-48 animate-pulse" />
+          <div className="bg-white rounded-[24px] md:rounded-[32px] p-5 md:p-6 shadow-[0_8px_24px_rgba(86,67,55,0.06)] h-48 animate-pulse" />
         </div>
       </div>
     );
@@ -86,10 +129,10 @@ export default function OverviewClient() {
   const { totals, trend, errors } = data;
 
   const statCards = [
-    { label: t("active_users"), value: totals.activeUsers, icon: "👥" },
-    { label: t("total_events"), value: totals.totalEvents.toLocaleString(), icon: "📊" },
-    { label: t("quota_used"), value: totals.totalQuotaUsed.toLocaleString(), icon: "⚡" },
-    { label: t("total_skills"), value: totals.totalSkills, icon: "🎯" },
+    { label: t("active_users"), value: totals.activeUsers, icon: UsersIcon },
+    { label: t("total_events"), value: totals.totalEvents.toLocaleString(), icon: DashboardIcon },
+    { label: t("quota_used"), value: totals.totalQuotaUsed.toLocaleString(), icon: BoltIcon },
+    { label: t("total_skills"), value: totals.totalSkills, icon: TargetIcon },
   ];
 
   const abilityData = trend.abilityBreakdown.map((a) => ({
@@ -107,36 +150,59 @@ export default function OverviewClient() {
   return (
     <div className="space-y-6">
       {/* Period selector */}
-      <div className="flex justify-end">
-        <div className="flex gap-1 bg-white rounded-full p-1 shadow-[0_4px_12px_rgba(86,67,55,0.08)]">
-          {(["7d", "30d"] as const).map((p) => (
-            <button
-              key={p}
-              onClick={() => setPeriod(p)}
-              className={`px-4 py-1.5 rounded-full text-sm font-body transition-all ${
-                period === p
-                  ? "bg-gradient-to-r from-[#a23f00] to-[#fa7025] text-white"
-                  : "text-[#586330] hover:bg-[#ede9cf]"
-              }`}
-            >
-              {p === "7d" ? t("period_7d") : t("period_30d")}
-            </button>
-          ))}
+      <div className="flex justify-start sm:justify-end">
+        <div ref={menuRef} className="relative">
+          <button
+            type="button"
+            onClick={() => setIsMenuOpen((prev) => !prev)}
+            className={`${filterControlClassName} inline-flex w-full min-w-0 items-center justify-between gap-3 sm:min-w-[120px]`}
+            style={{ fontFamily: "var(--font-vietnam)" }}
+            aria-haspopup="menu"
+            aria-expanded={isMenuOpen}
+          >
+            <span>{t(currentOption.labelKey)}</span>
+              <span className={`inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#f3e6d0] text-[#a23f00] transition-transform ${isMenuOpen ? "rotate-180" : ""}`}>
+                <ChevronDownIcon className="w-3 h-3" />
+              </span>
+          </button>
+          {isMenuOpen && (
+            <div className={menuClassName}>
+              {PERIOD_OPTIONS.map((option) => {
+                const selected = option.value === period;
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => { setPeriod(option.value); setIsMenuOpen(false); }}
+                    className={`${menuItemClassName} ${selected ? "bg-[#eee0c9] text-[#75563f]" : "text-[#8d745e] hover:bg-[#f5ede0] hover:text-[#a23f00]"}`}
+                    style={{ fontFamily: "var(--font-vietnam)" }}
+                    role="menuitemradio"
+                    aria-checked={selected}
+                  >
+                    <span className="truncate">{t(option.labelKey)}</span>
+                    <span className={`ml-3 inline-flex h-4 w-4 items-center justify-center ${selected ? "text-[#a23f00]" : "text-transparent"}`}>
+                      <ArrowRightIcon className="w-3 h-3" />
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         {statCards.map((card) => (
           <div
             key={card.label}
-            className="bg-white rounded-[32px] p-6 shadow-[0_8px_24px_rgba(86,67,55,0.06)]"
+            className="bg-white rounded-[24px] md:rounded-[32px] p-5 md:p-6 shadow-[0_8px_24px_rgba(86,67,55,0.06)]"
           >
             <div className="flex items-center gap-2 mb-3">
-              <span className="text-lg">{card.icon}</span>
+              <card.icon className="w-4 h-4 text-[#a23f00]" />
               <span className="text-xs text-[#a89070] font-body">{card.label}</span>
             </div>
-            <p className="text-3xl font-bold text-[#564337] font-heading">
+            <p className="text-2xl md:text-3xl font-bold text-[#564337] font-heading">
               {typeof card.value === "number" ? card.value.toLocaleString() : card.value}
             </p>
           </div>
@@ -144,9 +210,9 @@ export default function OverviewClient() {
       </div>
 
       {/* Charts row */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         {/* Top skills */}
-        <div className="bg-white rounded-[32px] p-6 shadow-[0_8px_24px_rgba(86,67,55,0.06)]">
+        <div className="bg-white rounded-[24px] md:rounded-[32px] p-5 md:p-6 shadow-[0_8px_24px_rgba(86,67,55,0.06)]">
           <h3 className="text-sm font-semibold text-[#a23f00] font-heading mb-4">{t("top_skills")}</h3>
           {trend.topSkills.length === 0 ? (
             <p className="text-sm text-[#a89070] font-body">{t("no_data")}</p>
@@ -169,20 +235,13 @@ export default function OverviewClient() {
         </div>
 
         {/* Event trend */}
-        <div className="bg-white rounded-[32px] p-6 shadow-[0_8px_24px_rgba(86,67,55,0.06)]">
-          <h3 className="text-sm font-semibold text-[#a23f00] font-heading mb-4">{t("event_trend")}</h3>
-          <LineChart
-            data={trend.eventsByDay}
-            color="#a23f00"
-            height={160}
-          />
-        </div>
+        <EventTrendCard period={period} t={(k: string) => t(k)} />
       </div>
 
       {/* Bottom row */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Ability breakdown */}
-        <div className="bg-white rounded-[32px] p-6 shadow-[0_8px_24px_rgba(86,67,55,0.06)]">
+        <div className="bg-white rounded-[24px] md:rounded-[32px] p-5 md:p-6 shadow-[0_8px_24px_rgba(86,67,55,0.06)]">
           <h3 className="text-sm font-semibold text-[#a23f00] font-heading mb-4">{t("ability_breakdown")}</h3>
           <div className="flex items-center justify-center">
             <PieChart data={abilityData} size={120} totalLabel={t("total_count")} />
@@ -190,7 +249,7 @@ export default function OverviewClient() {
         </div>
 
         {/* Provider breakdown */}
-        <div className="bg-white rounded-[32px] p-6 shadow-[0_8px_24px_rgba(86,67,55,0.06)]">
+        <div className="bg-white rounded-[24px] md:rounded-[32px] p-5 md:p-6 shadow-[0_8px_24px_rgba(86,67,55,0.06)]">
           <h3 className="text-sm font-semibold text-[#a23f00] font-heading mb-4">{t("provider_breakdown")}</h3>
           <div className="flex items-center justify-center">
             <PieChart data={providerData} size={120} totalLabel={t("total_count")} />
@@ -198,7 +257,7 @@ export default function OverviewClient() {
         </div>
 
         {/* Error tracking */}
-        <div className="bg-white rounded-[32px] p-6 shadow-[0_8px_24px_rgba(86,67,55,0.06)]">
+        <div className="bg-white rounded-[24px] md:rounded-[32px] p-5 md:p-6 shadow-[0_8px_24px_rgba(86,67,55,0.06)]">
           <h3 className="text-sm font-semibold text-[#a23f00] font-heading mb-4">{t("error_tracking")}</h3>
           <p className="text-3xl font-bold text-[#564337] font-heading mb-4">{errors.total}</p>
           {errors.byProvider.length === 0 ? (

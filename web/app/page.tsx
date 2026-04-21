@@ -54,17 +54,17 @@ export default async function HomePage() {
     <div className="min-h-screen">
       {/* Nav */}
       <nav className="sticky top-0 z-50 bg-[#fefae0]/90 backdrop-blur-md border-b border-[#e8dfc8]">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between md:px-8 md:py-4">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-2 flex-nowrap md:px-8 md:py-4">
           <Link href="/" className="flex items-center gap-2 group min-w-0">
             <ShrimpLogoIcon className="w-6 h-6 text-[#a23f00]" />
-            <span className="truncate text-lg sm:text-xl font-bold font-heading text-[#564337] group-hover:text-[#a23f00] transition-colors">
+            <span className="truncate text-base sm:text-xl font-bold font-heading text-[#564337] group-hover:text-[#a23f00] transition-colors">
               ClawPlay
             </span>
           </Link>
-          <div className="flex flex-wrap items-center gap-3 sm:gap-4 md:gap-6">
+          <div className="flex items-center gap-2 sm:gap-3 md:gap-6 flex-nowrap">
             <Link
               href="/skills"
-              className="text-sm font-medium text-[#7a6a5a] hover:text-[#a23f00] transition-colors font-body"
+              className="text-xs sm:text-sm font-medium text-[#7a6a5a] hover:text-[#a23f00] transition-colors font-body whitespace-nowrap"
             >
               {tCommon("explore")}
             </Link>
@@ -73,7 +73,7 @@ export default async function HomePage() {
             {auth ? (
               <Link
                 href="/dashboard"
-                className="px-5 py-2.5 bg-gradient-to-r from-[#a23f00] to-[#fa7025] hover:opacity-90 text-white text-sm font-semibold btn-pill shadow-[0_6px_24px_rgba(162,63,0,0.2)] transition-all font-heading"
+                className="px-3 py-2 sm:px-5 sm:py-2.5 bg-gradient-to-r from-[#a23f00] to-[#fa7025] hover:opacity-90 text-white text-xs sm:text-sm font-semibold btn-pill shadow-[0_6px_24px_rgba(162,63,0,0.2)] transition-all font-heading whitespace-nowrap"
               >
                 {tCommon("dashboard")}
               </Link>
@@ -81,7 +81,7 @@ export default async function HomePage() {
               <>
                 <Link
                   href="/login"
-                  className="px-5 py-2.5 bg-gradient-to-r from-[#a23f00] to-[#fa7025] hover:opacity-90 text-white text-sm font-semibold btn-pill shadow-[0_6px_24px_rgba(162,63,0,0.2)] transition-all font-heading"
+                  className="px-3 py-2 sm:px-5 sm:py-2.5 bg-gradient-to-r from-[#a23f00] to-[#fa7025] hover:opacity-90 text-white text-xs sm:text-sm font-semibold btn-pill shadow-[0_6px_24px_rgba(162,63,0,0.2)] transition-all font-heading whitespace-nowrap"
                 >
                   {tCommon("login")}
                 </Link>
@@ -102,7 +102,9 @@ export default async function HomePage() {
         <div className="relative max-w-4xl mx-auto text-center space-y-4">
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold font-heading text-[#564337] leading-[1.08] tracking-tight">
             {t("hero_title")}{" "}
-            <span className="bg-gradient-to-r from-[#a23f00] to-[#fa7025] bg-clip-text text-transparent">{t("hero_title_accent")}</span>
+            <span className="inline-block text-[#fa7025] sm:bg-gradient-to-r sm:from-[#a23f00] sm:to-[#fa7025] sm:bg-clip-text sm:text-transparent">
+              {t("hero_title_accent")}
+            </span>
           </h1>
           <p className="text-lg md:text-xl text-[#7a6a5a] max-w-2xl mx-auto leading-relaxed font-body">
             {t("hero_subtitle")}

@@ -181,9 +181,10 @@ export function GlobeIcon(props: IconProps) {
 
 export function CopyIcon(props: IconProps) {
   return (
-    <BaseIcon {...props}>
-      <rect x="8" y="8" width="9" height="10" rx="2" stroke="currentColor" strokeWidth="1.8" />
-      <rect x="5" y="5" width="9" height="10" rx="2" stroke="currentColor" strokeWidth="1.8" opacity="0.7" />
+    <BaseIcon {...props} stroke="currentColor" fill="none" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M7 9.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667l0 -8.666" />
+      <path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1" />
     </BaseIcon>
   );
 }
@@ -312,6 +313,32 @@ export function MessageIcon(props: IconProps) {
     <BaseIcon {...props}>
       <path d="M4.5 6.5h15v9h-8l-4.5 3v-3h-2.5z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
       <path d="M8 10h8M8 12.8h5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </BaseIcon>
+  );
+}
+
+export function ChatInstallIcon(props: IconProps) {
+  return (
+    <BaseIcon {...props}>
+      <path
+        d="M5.5 6.5A2.5 2.5 0 0 1 8 4h8a2.5 2.5 0 0 1 2.5 2.5v6A2.5 2.5 0 0 1 16 15H11l-3.5 3V15H8a2.5 2.5 0 0 1-2.5-2.5v-6Z"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path d="M8.5 9.2h7" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
+      <path d="M8.5 11.9h4.8" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
+    </BaseIcon>
+  );
+}
+
+export function TerminalIcon(props: IconProps) {
+  return (
+    <BaseIcon {...props}>
+      <rect x="4.5" y="5" width="15" height="14" rx="2.5" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M8 9.2 11 12l-3 2.8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M13 14.8h3.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
     </BaseIcon>
   );
 }

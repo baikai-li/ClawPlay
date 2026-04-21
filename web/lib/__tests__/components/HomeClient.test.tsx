@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, act, fireEvent } from "@testing-library/react";
 import { HomeClient } from "../../../app/HomeClient";
 import { TestWrapper } from "../../../test-utils";
+import zhMessages from "../../../messages/zh.json";
 
 describe("HomeClient", () => {
   beforeEach(() => {
@@ -15,14 +16,8 @@ describe("HomeClient", () => {
 
   it("renders the setup section with heading", () => {
     render(<HomeClient />, { wrapper: TestWrapper });
-    expect(screen.getByText("把这一行塞给 X Claw，好玩的全部解锁")).toBeInTheDocument();
-  });
-
-  it("renders the CLI command code block", () => {
-    render(<HomeClient />, { wrapper: TestWrapper });
-    expect(
-      screen.getByText("npm install -g clawplay && clawplay setup --agent")
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "通过对话安装" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByText(zhMessages.home_cli.chat_install_text)).toBeInTheDocument();
   });
 
   it("Copy button shows '复制' initially", () => {
@@ -37,6 +32,15 @@ describe("HomeClient", () => {
     const btn = screen.getByRole("button", { name: "复制" });
     fireEvent.click(btn);
     expect(document.execCommand).toHaveBeenCalledWith("copy");
+  });
+
+  it("switching to command-line mode updates the command", () => {
+    render(<HomeClient />, { wrapper: TestWrapper });
+
+    fireEvent.click(screen.getByRole("button", { name: "命令行安装" }));
+
+    expect(screen.getByRole("button", { name: "命令行安装" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByText(zhMessages.home_cli.cli_install_text)).toBeInTheDocument();
   });
 
   it("clicking Copy changes button text to '✅ 已复制！'", () => {

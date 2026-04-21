@@ -102,9 +102,10 @@
     "stats_desc_active": "7 天内有活动的用户"
   },
   "home_cli": {
-    "title": "把这一行塞给 X Claw，好玩的全部解锁",
-    "copied": "已复制",
-    "copy": "复制"
+    "chat_mode": "通过对话安装",
+    "cli_mode": "命令行安装",
+    "chat_install_text": "用 curl -fsSL https://clawplay.shop/install.md 安装 ClawPlay",
+    "cli_install_text": "npm install -g clawplay@latest && clawplay setup"
   },
   "community": {
     "title": "社区",

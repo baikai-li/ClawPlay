@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useT } from "@/lib/i18n/context";
+import { usePendingCount } from "@/lib/context/PendingCountContext";
 import SkillDiagramPreview from "@/components/SkillDiagramPreview";
 import { CalendarIcon, CheckIcon, CloseIcon, DocumentIcon, LinkIcon } from "@/components/icons";
 
@@ -60,6 +61,7 @@ export default function AdminReviewDetailPage() {
   const [skill, setSkill] = useState<SkillDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [actioning, setActioning] = useState(false);
+  const { decrement } = usePendingCount();
   const [feedback, setFeedback] = useState("");
   const [checklist, setChecklist] = useState({
     iconMatches: false,
@@ -101,6 +103,7 @@ export default function AdminReviewDetailPage() {
         body: JSON.stringify({ action: "approve" }),
       });
       if (res.ok) {
+        decrement();
         router.push("/admin/review");
       }
     } finally {
@@ -118,6 +121,7 @@ export default function AdminReviewDetailPage() {
         body: JSON.stringify({ action: "reject", reason: feedback }),
       });
       if (res.ok) {
+        decrement();
         router.push("/admin/review");
       }
     } finally {
@@ -358,7 +362,7 @@ export default function AdminReviewDetailPage() {
               </button>
               <button
                 onClick={reject}
-                disabled={actioning}
+                disabled={actioning || !feedback.trim()}
                 className="w-full flex items-center justify-center gap-3 min-h-12 border-2 border-[rgba(186,26,26,0.2)] text-[#ba1a1a] font-semibold rounded-full hover:bg-red-50 transition-colors font-heading disabled:opacity-50"
               >
                 <CloseIcon className="w-4 h-4" /> {t("reject_submission")}

@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useT } from "@/lib/i18n/context";
 import { AdminUserContext } from "@/lib/context/AdminUserContext";
+import { PendingCountContext } from "@/lib/context/PendingCountContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import {
   AdminShieldIcon,
@@ -323,7 +324,9 @@ export default function AdminLayout({
         {/* Page content */}
         <main className="flex-1 px-4 py-5 md:p-8">
           <AdminUserContext.Provider value={{ currentUserId: user?.id ?? null }}>
-            {children}
+            <PendingCountContext.Provider value={{ count: pendingCount, decrement: () => setPendingCount((n) => Math.max(0, n - 1)) }}>
+              {children}
+            </PendingCountContext.Provider>
           </AdminUserContext.Provider>
         </main>
       </div>

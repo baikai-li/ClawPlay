@@ -196,6 +196,13 @@ export async function POST(request: NextRequest) {
     );
   } catch (err) {
     console.error("[api/skills/submit]", err);
+    const msg = err instanceof Error ? err.message : String(err);
+    if (/no such column/i.test(msg) || /has no column/i.test(msg)) {
+      return NextResponse.json(
+        { error: "Database schema out of date. Please run migrations." },
+        { status: 500 }
+      );
+    }
     return NextResponse.json(
       { error: t("internal_error") },
       { status: 500 }

@@ -2,6 +2,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useT } from "@/lib/i18n/context";
+import { usePendingCount } from "@/lib/context/PendingCountContext";
 import { CheckIcon, CloseIcon, ChevronLeftIcon, ChevronRightIcon, SearchIcon } from "@/components/icons";
 
 interface Skill {
@@ -99,7 +100,7 @@ function SkillRow({
             />
             <button
               onClick={onConfirmReject}
-              disabled={isLoading}
+              disabled={isLoading || !rejectReason.trim()}
               className="min-h-10 px-3.5 py-2 bg-[#DC2626] hover:bg-[#b91c1c] text-white text-xs font-semibold rounded-full transition-colors disabled:opacity-50 whitespace-nowrap"
             >
               {isLoading ? "..." : t("confirm")}
@@ -148,6 +149,7 @@ function SkillRow({
 export default function AdminReviewPage() {
   const t = useT("admin_review");
   const tCommon = useT("common");
+  const { decrement } = usePendingCount();
   const [skills, setSkills] = useState<Skill[]>([]);
   const [loading, setLoading] = useState(true);
   const [actioningId, setActioningId] = useState<string | null>(null);
@@ -189,6 +191,7 @@ export default function AdminReviewPage() {
       });
       if (res.ok) {
         setSkills((prev) => prev.filter((s) => s.id !== skillId));
+        decrement();
       }
     } finally {
       setActioningId(null);
@@ -213,6 +216,7 @@ export default function AdminReviewPage() {
         setSkills((prev) => prev.filter((s) => s.id !== rejectId));
         setRejectId(null);
         setRejectReason("");
+        decrement();
       }
     } finally {
       setActioningId(null);

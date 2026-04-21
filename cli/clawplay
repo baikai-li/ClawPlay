@@ -310,9 +310,8 @@ ClawPlay CLI 配置向导（Agent 模式）
 3. 打开控制台：
    ${dashboard_url}
 4. 点击「生成密钥」，复制导出的 \`export CLAWPLAY_TOKEN=...\` 命令。
-5. 让用户任选一种方式完成配置：
-   - \`export CLAWPLAY_TOKEN='...'\`
-   - \`clawplay setup --token '...'\`
+5. 让用户运行配置命令：
+   \`clawplay setup --token '...'\`
 6. 配置完成后，运行 \`clawplay whoami\` 验证。
 
 EOF
@@ -326,9 +325,8 @@ ClawPlay CLI Setup Guide (Agent Mode)
 3. Open the dashboard:
    ${dashboard_url}
 4. Click Generate Key and copy the exported \`CLAWPLAY_TOKEN\` command.
-5. Ask the user to complete setup with one of these options:
-   - \`export CLAWPLAY_TOKEN='...'\`
-   - \`clawplay setup --token '...'\`
+5. Ask the user to run the setup command:
+   \`clawplay setup --token '...'\`
 6. After setup, run \`clawplay whoami\` to verify.
 
 EOF

@@ -4,6 +4,7 @@
  * including nginx reverse-proxy scenarios (X-Forwarded-Host / X-Forwarded-Proto).
  */
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { NextRequest } from "next/server";
 import { getPublicOrigin } from "@/lib/request-origin";
 import { makeRequest } from "./helpers/request";
 
@@ -117,7 +118,7 @@ describe("getPublicOrigin", () => {
       method: "GET",
     });
     // Convert to NextRequest (it handles missing Host gracefully)
-    const nextReq = new (require("next/server").NextRequest)(req.url, { headers: {} });
+    const nextReq = new NextRequest(req.url, { headers: {} });
     expect(() => getPublicOrigin(nextReq)).toThrow();
   });
 });

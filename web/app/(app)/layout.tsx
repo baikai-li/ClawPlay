@@ -92,25 +92,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     return () => document.removeEventListener("visibilitychange", onVisible);
   }, []);
 
-  // Re-fetch user when page becomes visible again (e.g. after OAuth redirect)
-  useEffect(() => {
-    function onVisible() {
-      if (!document.hidden) {
-        fetch("/api/user/me")
-          .then((r) => r.ok ? r.json() : null)
-          .then((data) => {
-            if (data) {
-              userCache.current = { user: data.user, loaded: true };
-              setUser(data.user);
-            }
-          })
-          .catch(() => {});
-      }
-    }
-    document.addEventListener("visibilitychange", onVisible);
-    return () => document.removeEventListener("visibilitychange", onVisible);
-  }, []);
-
   // Listen for profile updates from DashboardClient
   useEffect(() => {
     function onProfileUpdate(e: Event) {

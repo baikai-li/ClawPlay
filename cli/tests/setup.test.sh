@@ -77,20 +77,12 @@ AGENT_BIN=$(mktemp -d)
 AGENT_CURL_LOG=$(mktemp)
 AGENT_OPEN_LOG=$(mktemp)
 make_mock_bin_dir "$AGENT_BIN" "$AGENT_CURL_LOG" "$AGENT_OPEN_LOG"
-mkdir -p "${AGENT_HOME}/.openclaw"
-cat > "${AGENT_HOME}/.openclaw/openclaw.json" <<'EOF'
-{"skills":{"load":{"extraDirs":["/tmp/existing"]}}}
-EOF
-AGENT_OPENCLAW_BEFORE="$(cat "${AGENT_HOME}/.openclaw/openclaw.json")"
 
 run_setup --home "$AGENT_HOME" --mock-dir "$AGENT_BIN" -- setup --agent --lang en
 
 assert_contains "agent mode headline" "ClawPlay CLI Setup Guide" "$RS_STDOUT"
-assert_contains "agent mode includes skills prompt" "Use Bash / Write-like tools, or create a soft link, to add the following directory to your own skills configuration" "$RS_STDOUT"
-assert_contains "agent mode includes skills directory" "${AGENT_HOME}/.clawplay/skills" "$RS_STDOUT"
 assert_contains "agent mode includes login url" "login / registration page" "$RS_STDOUT"
 assert_contains "agent mode includes token command" "clawplay setup --token" "$RS_STDOUT"
-assert_eq "agent mode leaves openclaw config untouched" "$AGENT_OPENCLAW_BEFORE" "$(cat "${AGENT_HOME}/.openclaw/openclaw.json")"
 assert_eq "agent mode exit 0" "0" "$RS_EXIT"
 assert_eq "agent mode stderr empty" "" "$RS_STDERR"
 assert_eq "agent mode no curl" "" "$(cat "$AGENT_CURL_LOG")"
@@ -116,6 +108,8 @@ run_setup --home "$TOKEN_HOME" --mock-dir "$TOKEN_BIN" -- setup --token "export 
 assert_contains "token mode skips TUI headline" "Setup complete" "$RS_STDOUT"
 assert_contains "token mode verifies user" "Ada" "$RS_STDOUT"
 assert_contains "token mode saves token" "${TOKEN_HOME}/.zshrc" "$RS_STDOUT"
+assert_contains "token mode includes skills config step" "Use Bash / Write-like tools, or create a soft link, to add the following directory to your own skills configuration" "$RS_STDOUT"
+assert_contains "token mode includes skills directory" "${TOKEN_HOME}/.clawplay/skills" "$RS_STDOUT"
 assert_eq "token mode exit 0" "0" "$RS_EXIT"
 assert_eq "token mode stderr empty" "" "$RS_STDERR"
 assert_contains "token mode writes shell profile" "export CLAWPLAY_TOKEN='tok_123'" "$(cat "${TOKEN_HOME}/.zshrc")"

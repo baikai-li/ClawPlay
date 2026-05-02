@@ -25,14 +25,24 @@ jobs:
           timeout: 10m
           envs: DEPLOY_REGION,DEPLOY_PATH
           script: |
+            set -e
             cd $DEPLOY_PATH
             git fetch origin
             git checkout ${{ secrets.DEPLOY_BRANCH_HK }}
             git pull origin ${{ secrets.DEPLOY_BRANCH_HK }}
             cd web
-            npm ci --prefer-offline
+            npm ci --prefer-offline || npm install
             set -a && source .env.production && set +a
             npm run db:migrate
+
+            # Backup current build before rebuilding
+            BACKUP_DIR=".next-backup-$(date +%s)"
+            if [ -d .next ]; then mv .next "$BACKUP_DIR"; fi
+
+            # Build — if this fails, script exits here (set -e), backup still intact
             npm run build
-            pm2 startOrRestart /var/www/clawplay/ecosystem.config.cjs --env production
+
+            # Build succeeded: remove old backup, restart
+            rm -rf "$BACKUP_DIR"
+            pm2 restart /var/www/clawplay/ecosystem.config.cjs --env production
             pm2 save

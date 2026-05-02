@@ -31,7 +31,7 @@ export function parseSkillFrontmatter(raw: string): { meta: ParsedFrontmatter; c
         name: data.name as string | undefined,
         description: data.description as string | undefined,
         emoji: botMeta?.emoji as string | undefined,
-        bins: requires?.bins as string[] | undefined,
+        bins: (Array.isArray(requires?.bins) ? requires.bins : undefined) as string[] | undefined,
       },
       content: parsed.content.trimStart(),
     };

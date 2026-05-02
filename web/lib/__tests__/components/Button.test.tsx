@@ -17,7 +17,7 @@ describe("Button", () => {
     render(<Button variant="secondary">Secondary</Button>);
     const btn = screen.getByRole("button");
     expect(btn.className).toContain("border-2");
-    expect(btn.className).toContain("border-[#a23f00]");
+    expect(btn.className).toContain("border-[#2d67f7]");
   });
 
   it("applies danger variant red background", () => {
@@ -29,8 +29,8 @@ describe("Button", () => {
   it("applies ghost variant with no background", () => {
     render(<Button variant="ghost">Ghost</Button>);
     const btn = screen.getByRole("button");
-    expect(btn.className).toContain("text-[#a23f00]");
-    expect(btn.className).toContain("hover:bg-[#faf3d0]");
+    expect(btn.className).toContain("text-[#2d67f7]");
+    expect(btn.className).toContain("hover:bg-[#f0f6ff]");
   });
 
   it("applies sm size classes", () => {

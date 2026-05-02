@@ -31,6 +31,7 @@ jobs:
             git pull origin ${{ secrets.DEPLOY_BRANCH_HK }}
             cd web
             npm ci --prefer-offline
+            set -a && source .env.production && set +a
             npm run db:migrate
             npm run build
             pm2 startOrRestart /var/www/clawplay/ecosystem.config.cjs --env production
